@@ -17,12 +17,37 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" ExcludeAssets="all" GeneratePathProperty="true"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="**/*"/>
-    <Content Include="ref/$(GameVersion)/*" Pack="true" PackagePath="ref/$(TargetFramework)/"/>
+    <Content Include="ref/$(GameVersion)/*" Exclude="ref/$(GameVersion)/AD_*" Pack="true" PackagePath="ref/$(TargetFramework)"/>
+    <Publicize Include="ref/$(GameVersion)/AD_*" Publicize="true" Strip="true"/>
   </ItemGroup>
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="doc/"/>
   </ItemGroup>
+
+  <UsingTask TaskName="PublicizeTask" AssemblyFile="$(PkgBepInEx_AssemblyPublicizer_MSBuild)/lib/net472/BepInEx.AssemblyPublicizer.MSBuild.dll"/>
+  <Target Name="Publicize" AfterTargets="ResolveReferences" BeforeTargets="FindReferenceAssembliesForReferences">
+    <PropertyGroup>
+      <GeneratedIgnoresAccessChecksToFile>$(IntermediateOutputPath)$(MSBuildProjectName).IgnoresAccessChecksTo.cs</GeneratedIgnoresAccessChecksToFile>
+    </PropertyGroup>
+
+    <PublicizeTask IntermediateOutputPath="$(IntermediateOutputPath)" 
+            GeneratedIgnoresAccessChecksToFile="$(GeneratedIgnoresAccessChecksToFile)"
+            ReferencePath="@(Publicize)"
+            PackageReference=""
+            Publicize="@(Publicize)">
+        <Output TaskParameter="PublicizedReferences" ItemName="PublicizedReferences"/>
+    </PublicizeTask>
+
+    <ItemGroup>
+      <Content Include="@(PublicizedReferences)" Pack="true" PackagePath="ref/$(TargetFramework)"/>
+    </ItemGroup>
+    
+  </Target>
 
 </Project>
