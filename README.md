@@ -1,0 +1,1 @@
+Game libraries necessary for modding the game GRIME. See the [templates package](https://www.nuget.org/packages/Grime.Modding.Templates) for more information.
