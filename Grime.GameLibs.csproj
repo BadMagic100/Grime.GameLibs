@@ -18,12 +18,13 @@
 
   <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" ExcludeAssets="all" GeneratePathProperty="true"/>
+    <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.7.31.1" IncludeAssets="all"/>
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="**/*"/>
     <Content Include="ref/$(GameVersion)/*" Exclude="ref/$(GameVersion)/AD_*" Pack="true" PackagePath="ref/$(TargetFramework)"/>
-    <Publicize Include="ref/$(GameVersion)/AD_*" Publicize="true" Strip="true"/>
+    <GameFiles Include="ref/$(GameVersion)/AD_*" Publicize="true" Strip="true"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -38,16 +39,29 @@
 
     <PublicizeTask IntermediateOutputPath="$(IntermediateOutputPath)" 
             GeneratedIgnoresAccessChecksToFile="$(GeneratedIgnoresAccessChecksToFile)"
-            ReferencePath="@(Publicize)"
+            ReferencePath="@(GameFiles)"
             PackageReference=""
-            Publicize="@(Publicize)">
+            Publicize="">
         <Output TaskParameter="PublicizedReferences" ItemName="PublicizedReferences"/>
     </PublicizeTask>
 
     <ItemGroup>
       <Content Include="@(PublicizedReferences)" Pack="true" PackagePath="ref/$(TargetFramework)"/>
     </ItemGroup>
-    
+  </Target>
+
+  <Target Name="HookGen" AfterTargets="PostBuildEvent" Outputs="%(GameFiles.Identity)">
+    <PropertyGroup>
+      <Mono Condition="$(OS) == WINDOWS_NT"/>
+      <Mono Condition="$(OS) != WINDOWS_NT">mono</Mono>
+      <HookFileName>MMHOOK_%(GameFiles.FileName).dll</HookFileName>
+    </PropertyGroup>
+
+    <Exec WorkingDirectory="$(TargetDir)" 
+            Command="$(Mono) MonoMod.RuntimeDetour.HookGen.exe --private &quot;$(ProjectDir)%(GameFiles.Identity)&quot; $(HookFileName)"/>
+    <ItemGroup>
+      <Content Include="$(TargetDir)/$(HookFileName)" Pack="true" PackagePath="ref/$(TargetFramework)"/>
+    </ItemGroup>
   </Target>
 
 </Project>
