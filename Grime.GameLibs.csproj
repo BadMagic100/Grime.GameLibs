@@ -19,7 +19,7 @@
     However we do not care about this and would rather declutter our users' build directories at the cost of "forcing"
     the usage of PackageReference.
     -->
-    <NoWarn>NU5131</NoWarn>
+    <NoWarn>$(NoWarn);NU5131</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
