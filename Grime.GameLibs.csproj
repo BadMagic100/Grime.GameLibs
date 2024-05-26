@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" ExcludeAssets="all" GeneratePathProperty="true"/>
-    <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.7.31.1" IncludeAssets="all"/>
+    <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.7.31.1" PrivateAssets="all"/>
   </ItemGroup>
 
   <ItemGroup>
